@@ -9,8 +9,8 @@ class PostThreadsController < ApplicationController
 
   # GET /post_threads/{id}
   def show
-    @posts = Post.joins(:user).joins(:category).select('posts.*, users.username, categories.cat').order(created_at: :desc).where(:post_thread_id => params[:id])
-    @posts = @posts.map {|post| post.as_json.merge({ avatar: User.find(post.user_id).avatar.url })}
+    @posts = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(created_at: :desc).where(:post_thread_id => params[:id])
+    @posts = @posts.map {|post| post.as_json.merge({ avatar: get_avatar(post) })}
     render json: @posts
   end
 

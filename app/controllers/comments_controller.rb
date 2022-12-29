@@ -5,7 +5,7 @@ class CommentsController < ApplicationController
   def index
     @post = Post.find(params[:post_id])
     @comments = @post.comment.joins(:user).select('comments.*, users.username').order(created_at: :desc).all()
-    @comments = @comments.map {|comment| comment.as_json.merge({ avatar: User.find(comment.user_id).avatar.url })}
+    @comments = @comments.map {|comment| comment.as_json.merge({ avatar: get_avatar(comment) })}
     render json: @comments
   end
 
@@ -13,7 +13,7 @@ class CommentsController < ApplicationController
   def show
     @post = Post.find(params[:post_id])
     @comment = @post.comment.joins(:user).select('comments.*, users.username').order(created_at: :desc).find(params[:id])
-    @comment = @comment.as_json.merge({ avatar: User.find(@comment.user_id).avatar.url })
+    @comment = @comment.as_json.merge({ avatar: get_avatar(@comment) })
     render json: @comment
   end
 
@@ -27,7 +27,7 @@ class CommentsController < ApplicationController
 
     if @comment.save
       @user = User.find(@comment.user_id)
-      @comment = @comment.as_json.merge({ username: @user.username, avatar: @user.avatar.url })
+      @comment = @comment.as_json.merge({ username: @user.username, avatar: get_avatar(@user) })
       render json: @comment
     else
       render json: @comment.errors, status: :unprocessable_entity

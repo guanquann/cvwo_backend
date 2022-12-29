@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
+  # http://localhost:3000/rails/info/routes
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "posts#index"
 
   resources :post_threads
 

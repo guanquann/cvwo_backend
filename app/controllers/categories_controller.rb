@@ -10,7 +10,7 @@ class CategoriesController < ApplicationController
   # GET /categories/{id}
   def show
     @posts = Post.joins(:user).joins(:category).select('posts.*, users.username, categories.cat').order(created_at: :desc).where(:category_id => params[:id])
-    @posts = @posts.map {|post| post.as_json.merge({ avatar: User.find(post.user_id).avatar.url })}
+    @posts = @posts.map {|post| post.as_json.merge({ avatar: get_avatar(post) })}
     render json: @posts
   end
 

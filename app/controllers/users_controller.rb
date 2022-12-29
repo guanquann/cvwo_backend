@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   # GET /users
   def index
     @users = User.all()
-    @users = @users.map {|user| user.as_json.merge({ avatar: user.avatar.url })}
+    @users = @users.map {|user| user.as_json.merge({ avatar: get_avatar(user) })}
     render json: @users, status: :ok
   end
 
@@ -16,12 +16,12 @@ class UsersController < ApplicationController
     @posts = Post.joins(:user).select('users.*, posts.*').order(created_at: :desc).where(:user_id => params[:id])
     @posts = @posts.map do |post|
       if params[:public] == "true"
-        post = post.as_json.merge({ avatar: User.find(post.user_id).avatar.url })
+        post = post.as_json.merge({ avatar: get_avatar(post) })
       else
-        post = post.as_json.merge({ avatar: User.find(post.user_id).avatar.url, is_upvoted: get_is_upvoted(post) })
+        post = post.as_json.merge({ avatar: get_avatar(post), is_upvoted: get_is_upvoted(post) })
       end
     end
-    render json: @user.as_json.merge({ avatar: @user.avatar.url, posts: @posts }), status: :ok 
+    render json: @user.as_json.merge({ avatar: get_avatar(@user), posts: @posts }), status: :ok 
   end
 
   # POST /users

@@ -7,9 +7,9 @@ class PostsController < ApplicationController
     @posts = @posts.map do |post|
       # if current session is authenticated, find whether current user upvotes the post
       if params[:public] == "true"
-        @merge_dict = { avatar: User.find(post.user_id).avatar.url }
+        @merge_dict = { avatar: get_avatar(post) }
       else
-        @merge_dict = { avatar: User.find(post.user_id).avatar.url, is_upvoted: get_is_upvoted(post) }
+        @merge_dict = { avatar: get_avatar(post), is_upvoted: get_is_upvoted(post) }
       end
       post = post.as_json.merge(@merge_dict)
     end
@@ -20,9 +20,9 @@ class PostsController < ApplicationController
   def show
     @post = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(created_at: :desc).find(params[:id])
     if params[:public] == "true"
-      @merge_dict = { avatar: User.find(@post.user_id).avatar.url }
+      @merge_dict = { avatar: get_avatar(@post) }
     else
-      @merge_dict = { avatar: User.find(@post.user_id).avatar.url, is_upvoted: get_is_upvoted(@post) }
+      @merge_dict = { avatar: get_avatar(@post), is_upvoted: get_is_upvoted(@post) }
     end
     @post = @post.as_json.merge(@merge_dict)
     render json: @post

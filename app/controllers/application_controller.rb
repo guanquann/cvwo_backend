@@ -21,4 +21,11 @@ class ApplicationController < ActionController::API
       vote = post.vote.find_by( user_id: @current_user.id )
       vote = vote.present? ? vote.is_upvoted : nil
     end
+
+    def get_avatar(variable)
+      if variable.is_a?(Post) || variable.is_a?(Comment)
+        variable = User.find(variable.user_id)
+      end
+      variable.avatar.url
+    end
   end

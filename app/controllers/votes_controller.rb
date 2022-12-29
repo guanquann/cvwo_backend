@@ -28,7 +28,7 @@ class VotesController < ApplicationController
         @post.update_attribute(:vote_count, @post.vote_count + (@vote.is_upvoted ? -2 : 2))
         @vote.update_attribute(:is_upvoted, params[:is_upvoted])
       end
-      render json: @post
+      render json: @post.as_json.merge({ is_upvoted: get_is_upvoted(@post) })
 
     else
       @vote = @post.vote.create(vote_params)
@@ -36,7 +36,7 @@ class VotesController < ApplicationController
       @post.update_attribute(:vote_count, @post.vote_count + (@vote.is_upvoted ? 1 : -1))
 
       if @vote.save
-        render json: @post
+        render json: @post.as_json.merge({ is_upvoted: get_is_upvoted(@post) })
       else
         render json: @post.errors, status: :unprocessable_entity
       end
