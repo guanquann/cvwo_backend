@@ -1,5 +1,6 @@
 class PostThreadsController < ApplicationController
-  before_action :authorize_request, except: [:index, :show]
+  before_action :authorize_request
+  before_action :validate_user, except: [:index, :show]
   
   # GET /post_threads
   def index
@@ -9,8 +10,15 @@ class PostThreadsController < ApplicationController
 
   # GET /post_threads/{id}
   def show
-    @posts = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(created_at: :desc).where(:post_thread_id => params[:id])
-    @posts = @posts.map {|post| post.as_json.merge({ avatar: get_avatar(post) })}
+    @posts = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(sort_by(params[:sort])).where(:post_thread_id => params[:id])
+    @posts = @posts.map do |post|
+      if @current_user == nil
+        @merge_dict = { avatar: get_avatar(post) }
+      else
+        @merge_dict = { avatar: get_avatar(post), is_upvoted: get_is_upvoted(post) }
+      end
+      post = post.as_json.merge(@merge_dict)
+    end
     render json: @posts
   end
 
@@ -45,6 +53,6 @@ class PostThreadsController < ApplicationController
 
   private
     def thread_params
-      params.permit(:title, :description)
+      params.permit(:title, :description, :sort)
     end
 end

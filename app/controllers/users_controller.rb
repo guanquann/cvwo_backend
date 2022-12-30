@@ -1,7 +1,7 @@
 
 class UsersController < ApplicationController
-  before_action :authorize_request, except: :create, unless: -> { params[:public] == "true" }
-  # before_action :find_user, except: %i[create index]
+  before_action :authorize_request, except: :create
+  before_action :find_user, except: %i[create index]
 
   # GET /users
   def index
@@ -13,15 +13,22 @@ class UsersController < ApplicationController
   # GET /users/{id}
   def show
     @user = User.find(params[:id])
+    avatar = get_avatar(@user)
+
     @posts = Post.joins(:user).select('users.*, posts.*').order(created_at: :desc).where(:user_id => params[:id])
     @posts = @posts.map do |post|
-      if params[:public] == "true"
-        post = post.as_json.merge({ avatar: get_avatar(post) })
+      if @current_user == nil
+        post = post.as_json.merge({ avatar: avatar })
       else
-        post = post.as_json.merge({ avatar: get_avatar(post), is_upvoted: get_is_upvoted(post) })
+        post = post.as_json.merge({ avatar: avatar, is_upvoted: get_is_upvoted(post) })
       end
     end
-    render json: @user.as_json.merge({ avatar: get_avatar(@user), posts: @posts }), status: :ok 
+
+    @comments = Comment.joins(:user).select('users.*, comments.*').order(created_at: :desc).where(:user_id => params[:id])
+    @comments = @comments.map do |comment|
+      comment = comment.as_json.merge({ avatar: avatar })
+    end
+    render json: @user.as_json.merge({ avatar: avatar, posts: @posts, comments: @comments }), status: :ok 
   end
 
   # POST /users
@@ -61,6 +68,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.permit(:username, :email, :password, :avatar, :public)
+    params.permit(:username, :email, :password, :avatar)
   end
 end

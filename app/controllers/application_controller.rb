@@ -8,8 +8,12 @@ class ApplicationController < ActionController::API
       header = request.headers['Authorization']
       header = header.split(' ').last if header
       begin
-        @decoded = JsonWebToken.decode(header)
-        @current_user = User.find(@decoded[:user_id])
+        if header == nil
+          @current_user = nil
+        else
+          @decoded = JsonWebToken.decode(header)
+          @current_user = User.find(@decoded[:user_id])
+        end
       rescue ActiveRecord::RecordNotFound => e
         render json: { errors: e.message }, status: :unauthorized
       rescue JWT::DecodeError => e
@@ -27,5 +31,23 @@ class ApplicationController < ActionController::API
         variable = User.find(variable.user_id)
       end
       variable.avatar.url
+    end
+
+    def validate_user
+      if @current_user == nil
+        render json: { errors: 'Authorisation Headers not filled' }, status: :unauthorized
+      end
+    end
+
+    def sort_by(query)
+      if query == 'upvote'
+        query = 'vote_count DESC'
+      elsif query == 'downvote'
+        query = 'vote_count ASC'
+      elsif query == 'comment'
+        query = 'comment_count DESC'
+      else
+        query = 'created_at DESC'
+      end
     end
   end

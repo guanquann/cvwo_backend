@@ -1,12 +1,12 @@
 class PostsController < ApplicationController
-  before_action :authorize_request, unless: -> { params[:public] == "true" }
+  before_action :authorize_request
+  before_action :validate_user, except: [:index, :show]
   
   # GET /posts 
   def index
-    @posts = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(created_at: :desc).all()
+    @posts = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(sort_by(params[:sort])).all()
     @posts = @posts.map do |post|
-      # if current session is authenticated, find whether current user upvotes the post
-      if params[:public] == "true"
+      if @current_user == nil
         @merge_dict = { avatar: get_avatar(post) }
       else
         @merge_dict = { avatar: get_avatar(post), is_upvoted: get_is_upvoted(post) }
@@ -18,8 +18,8 @@ class PostsController < ApplicationController
 
   # GET /posts/{id}
   def show
-    @post = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(created_at: :desc).find(params[:id])
-    if params[:public] == "true"
+    @post = Post.joins(:user).joins(:category).joins(:post_thread).select('posts.*, users.username, categories.cat, post_threads.title as thread').order(sort_by(params[:sort])).find(params[:id])
+    if @current_user == nil
       @merge_dict = { avatar: get_avatar(@post) }
     else
       @merge_dict = { avatar: get_avatar(@post), is_upvoted: get_is_upvoted(@post) }
@@ -60,6 +60,6 @@ class PostsController < ApplicationController
 
   private
     def post_params
-      params.permit(:title, :description, :category_id, :post_thread_id, :public, images: [])
+      params.permit(:title, :description, :category_id, :post_thread_id, :sort, images: [])
     end
 end
