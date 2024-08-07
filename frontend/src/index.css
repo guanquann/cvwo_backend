@@ -1,0 +1,44 @@
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.markdown p {
+  margin: 0;
+}
+
+.markdown pre {
+  background-color: #23241f;
+  color: #f8f8f2;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+
+.markdown a {
+  text-decoration: underline;
+  color: hsl(209, 100%, 37.5%) !important;
+  border-radius: 3px;
+}
+
+.markdown blockquote {
+  border-left: 4px solid #ccc;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-left: 16px;
+}
+
+.markdown .ql-size-small {
+  font-size: 0.75em;
+}
+
+.markdown .ql-size-large {
+  font-size: 1.5em;
+}
+
+.markdown .ql-size-huge {
+  font-size: 2.5em;
+}

@@ -1,24 +1,5 @@
-# README
+# Forum Page
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### Made using Ruby on Rails, TypeScript and Redux
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+https://user-images.githubusercontent.com/76832850/219950026-048e209c-d37e-4407-9a92-daf638d9e7aa.mp4
